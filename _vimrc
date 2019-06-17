@@ -270,14 +270,8 @@ let g:UltiSnipsEditSplit="vertical"
 
 nmap <leader>s :update<CR>
 vmap <leader>s :update<CR>
-inoremap <C-BS> <Esc>bdei
 nnoremap <C-left> :bn<CR>
 nnoremap <C-right> :bp<CR>
-
-nnoremap <leader>a ^
-vnoremap <leader>a ^ inoremap <leader>a ^
-nnoremap <leader>n $
-vnoremap <leader>n $ inoremap <leader>n $
 
 nmap <leader>tn :tabnew<cr>
 nmap <leader>tc :tabclose<cr>
@@ -299,5 +293,4 @@ inoremap <M-j> <Down>
 inoremap <M-k> <Up>
 inoremap <M-h> <left>
 inoremap <M-l> <Right>
- " Don't use Ex mode, use Q for formatting
-noremap Q gq
+
