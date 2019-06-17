@@ -10,10 +10,27 @@
 call plug#begin('~/vimfiles/autoload')
 " Make sure you use single quotes
 "
+"Plug 'Yggdroot/LeaderF', { 'do': '.\install.bat' }
+
+"language highlight
+Plug 'sheerun/vim-polyglot'
+
+"start screen
+Plug 'mhinz/vim-startify'
+
+"show keybidings
+Plug 'liuchengxu/vim-which-key', { 'on': ['WhichKey', 'WhichKey!'] }
+
+"org mode
+Plug 'jceb/vim-orgmode'
+Plug 'tpope/vim-speeddating'
 
 Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
 
-Plug 'Valloric/YouCompleteMe'
+"Plug 'Valloric/YouCompleteMe'
+" autocomplete
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 Plug 'jiangmiao/auto-pairs'
 
@@ -22,6 +39,9 @@ Plug 'pangloss/vim-javascript'
 "
 " :Tab /+target to make alignment, /+target\zs to exclude the target charater from the search match
 Plug 'godlygeek/tabular'
+" Shorthand notation; fetches https://github.com/junegunn/vim-easy-align
+"Plug 'junegunn/vim-easy-align'
+
 
 " \s+target to jump
 Plug 'easymotion/vim-easymotion'
@@ -33,14 +53,11 @@ Plug 'NikolayFrantsev/jshint2.vim'
 " stop(MarkdownPreviewStop)
 "
 " pre build
-Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() } }
+"Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() } }
 " yarn & node
-"Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install'  }
+Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install'  }
 
-" Shorthand notation; fetches https://github.com/junegunn/vim-easy-align
-Plug 'junegunn/vim-easy-align'
-
-" Any valid git URL is allowed
+"
 Plug 'https://github.com/junegunn/vim-github-dashboard.git'
 
 " Multiple Plug commands can be written in a single line using | separators
@@ -56,12 +73,9 @@ Plug 'tpope/vim-fireplace', { 'for': 'clojure' }
 Plug 'scrooloose/nerdcommenter'
 
 " Using a non-master branch
-Plug 'rdnetto/YCM-Generator', { 'branch': 'stable' }
+"Plug 'rdnetto/YCM-Generator', { 'branch': 'stable' }
 
 " Using a tagged release; wildcard allowed (requires git 1.9.2 or above)
-
-" Plugin outside ~/.vim/plugged with post-update hook
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 
 " Unmanaged plugin (manually installed and updated)
 Plug '~/my-prototype-plugin'
@@ -73,7 +87,7 @@ Plug 'dracula/vim'
 Plug 'kien/ctrlp.vim'
 
 "multiple selections
-Plug 'terryma/vim-multiple-cursors'
+Plug 'mg979/vim-visual-multi'
 
 "Highlights trailing whitespace
 Plug 'bronson/vim-trailing-whitespace'
@@ -85,22 +99,38 @@ Plug 'mattn/emmet-vim'
 "                              plugin settings                               "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-"
-map <Leader> <f>(easymotion-prefix)
+"startify settings
+let g:startify_bookmarks=[{'s':'~\_vimrc'}, {'n':'~\dixon\notes\quickNotes.org'}]
+let g:startify_lists = [
+          \ { 'type': 'files',     'header': ['   MRU']            },
+          \ { 'type': 'sessions',  'header': ['   Sessions']       },
+          \ { 'type': 'bookmarks', 'header': ['   Bookmarks']      },
+          \ { 'type': 'commands',  'header': ['   Commands']       },
+          \ ]
+
+" coc.vim settings
+" if hidden is not set, TextEdit might fail.
+set hidden
+" always show signcolumns
+set signcolumn=yes
+" You will have bad experience for diagnostic messages when it's default 4000.
+set updatetime=300
+
+"coc.vim settings encoding
+
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#formatter = 'unique_tail'
+
 "markdown preview
-nmap <silent> <F8> <Plug>MarkdownPreview
-" for insert mode
-imap <silent> <F8> <Plug>MarkdownPreview
-" for normal mode
-nmap <silent> <F9> <Plug>StopMarkdownPreview
-" for insert mode
-imap <silent> <F9> <Plug>StopMarkdownPreview
+let g:mkdp_browser = 'chrome'
+" use a custom port to start server or random for empty
+let g:mkdp_port = '12345'
 " set to 1, the nvim will open the preview window once enter the markdown buffer
-let g:mkdp_auto_start = 0
+let g:mkdp_auto_start = 1
 " set to 1, preview server available to others in your network by default, the server only listens on localhost (127.0.0.1)
 let g:mkdp_open_to_the_world = 1
 " use a custom markdown style must be absolute path
-let g:mkdp_markdown_css = 'markdown.css'
+"let g:mkdp_markdown_css = 'markdown.css'
 
 
 "jshint2
@@ -145,9 +175,9 @@ let g:jsx_ext_required = 0
 "                               common setting                               "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
  " 启动最大化
-if has('gui_running')
-    au GUIEnter * simalt ~x
-endif
+"if has('gui_running')
+"    au GUIEnter * simalt ~x
+"endif
 
 colorscheme dracula
 set number
@@ -189,10 +219,8 @@ set history=1024
 set autochdir
 set whichwrap=b,s,h,l,<,>,[,]
 set nobomb
-set backspace=indent,eol
-" set clipboard+=unnamed
-
-set clipboard=unnamed
+set backspace=indent,eol,start
+set clipboard+=unnamed
 
 set winaltkeys=no
 
@@ -207,7 +235,7 @@ set cmdheight=1 " 1 screen lines to use for the command-line
 set showfulltag " show tag with function protype.
 
 set fileencodings=utf-8,utf-16,gbk,big5,gb18030,latin1
-set encoding=gbk
+set encoding=utf-8
 
 syntax on
 syntax enable
@@ -219,6 +247,19 @@ set hlsearch
  """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "                               keyboard-binding                             "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" easymotion
+" <Leader>f{char} to move to {char}
+map  <Leader>f <Plug>(easymotion-bd-f)
+nmap <Leader>f <Plug>(easymotion-overwin-f)
+
+" Move to line
+map <Leader>l <Plug>(easymotion-bd-jk)
+nmap <Leader>l <Plug>(easymotion-overwin-line)
+
+" Move to word
+map  <Leader>w <Plug>(easymotion-bd-w)
+nmap <Leader>w <Plug>(easymotion-overwin-w)
+
 "NerdTree ####
 map <C-t> :NERDTreeToggle<CR>
 "ultisnip ####
