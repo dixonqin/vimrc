@@ -10,8 +10,9 @@
 call plug#begin('~/vimfiles/autoload')
 " Make sure you use single quotes
 "
-"Plug 'Yggdroot/LeaderF', { 'do': '.\install.bat' }
+Plug 'Yggdroot/LeaderF', { 'do': '.\install.bat' }
 
+Plug 'chemzqm/wxapp.vim'
 "language highlight
 Plug 'sheerun/vim-polyglot'
 
@@ -60,8 +61,9 @@ Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install'  }
 "
 Plug 'https://github.com/junegunn/vim-github-dashboard.git'
 
-" Multiple Plug commands can be written in a single line using | separators
+" ultisnips
 Plug 'SirVer/ultisnips'
+" Multiple Plug commands can be written in a single line using | separators
 Plug 'honza/vim-snippets'
 Plug 'isRuslan/vim-es6' | Plug 'mxw/vim-jsx'
 
@@ -84,7 +86,7 @@ Plug 'tomasr/molokai' | Plug 'altercation/solarized'
 Plug 'dracula/vim'
 
 "Fuzzy file, buffer, mru, tag, etc finder.
-Plug 'kien/ctrlp.vim'
+"Plug 'kien/ctrlp.vim'
 
 "multiple selections
 Plug 'mg979/vim-visual-multi'
@@ -98,6 +100,12 @@ Plug 'mattn/emmet-vim'
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "                              plugin settings                               "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" coc-config  get correct comment highlighting
+autocmd FileType json syntax match Comment +\/\/.\+$+
+
+" leaderF
+let g:Lf_ShortcutF = '<C-P>'
 
 "startify settings
 let g:startify_bookmarks=[{'s':'~\_vimrc'}, {'n':'~\dixon\notes\quickNotes.org'}]
@@ -115,8 +123,60 @@ set hidden
 set signcolumn=yes
 " You will have bad experience for diagnostic messages when it's default 4000.
 set updatetime=300
+" Better display for messages
+set cmdheight=2
+" Some servers have issues with backup files, see #649
+set nobackup
+set nowritebackup
+" don't give |ins-completion-menu| messages.
+set shortmess+=c
+
+" if the completion show press <tab> to select completion, else press <tab>
+" just <tab>
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? coc#_select_confirm() :
+      \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+let g:coc_snippet_next = '<tab>'
+
+augroup mygroup
+  autocmd!
+  " Setup formatexpr specified filetype(s).
+  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+  " Update signature help on jump placeholder
+  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+augroup end
+" Use `:Format` to format current buffer
+command! -nargs=0 Format :call CocAction('format')
+
+" Use `:Fold` to fold current buffer
+command! -nargs=? Fold :call     CocAction('fold', <f-args>)
+
+" use `:OR` for organize import of current buffer
+command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
+
+" Add diagnostic info for https://github.com/itchyny/lightline.vim
+let g:lightline = {
+      \ 'colorscheme': 'wombat',
+      \ 'active': {
+      \   'left': [ [ 'mode', 'paste' ],
+      \             [ 'cocstatus', 'readonly', 'filename', 'modified' ] ]
+      \ },
+      \ 'component_function': {
+      \   'cocstatus': 'coc#status'
+      \ },
+      \ }
+
 
 "coc.vim settings encoding
+
 
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#formatter = 'unique_tail'
@@ -153,16 +213,23 @@ call plug#end()
 
 
 "ctrlp ####
-let g:ctrlp_map = '<c-p>'
-let g:ctrlp_cmd = 'CtrlP'
-let g:ctrlp_working_path_mode = 'ra'
-set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe
+"let g:ctrlp_map = '<c-p>'
+"let g:ctrlp_cmd = 'CtrlP'
+"let g:ctrlp_working_path_mode = 'ra'
 "let g:ctrlp_user_command = 'dir %s /-n /b /s /a-d'
-
+"let g:ctrlp_custom_ignore = {
+"  \ 'dir':  '\v[\/]\.(git|hg|svn)$',
+"  \ 'file': '\v\.(exe|so|dll)$',
+"  \ 'link': 'some_bad_symbolic_links',
+"  \ }
 
 "nerdcommenter ####
 let g:NERDSpaceDelims = 1
 let g:NERDTrimTrailingWhitespace = 1
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | exe 'cd '.argv()[0] | endif
+let NERDTreeShowBookmarks=1  " 开启Nerdtree时自动显示Bookmarks
+let NERDTreeBookmarksFile=''
 
 "vim-easy-align ####
 xmap ga <e>(EasyAlign)
@@ -175,14 +242,15 @@ let g:jsx_ext_required = 0
 "                               common setting                               "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
  " 启动最大化
-"if has('gui_running')
-"    au GUIEnter * simalt ~x
-"endif
+if has('gui_running')
+    au GUIEnter * simalt ~x
+endif
 
 colorscheme dracula
 set number
 " 高亮当前行
 set cursorline
+set foldenable
 
 filetype plugin indent on
 set autoindent
@@ -262,11 +330,6 @@ nmap <Leader>w <Plug>(easymotion-overwin-w)
 
 "NerdTree ####
 map <C-t> :NERDTreeToggle<CR>
-"ultisnip ####
-let g:UltiSnipsExpandTrigger="<tab>"
-let g:UltiSnipsJumpForwardTrigger="<c-b>"
-let g:UltiSnipsJumpBackwardTrigger="<c-z>"
-let g:UltiSnipsEditSplit="vertical"
 
 nmap <leader>s :update<CR>
 vmap <leader>s :update<CR>
